@@ -16,7 +16,7 @@ private
  end
 
  def sign_up_params
-   params.require(:user).permit(:username, :first_name, :last_name, :email, :password, :password_confirmation)
+   params.require(:user).permit(:name, :github_username, :email, :password, :password_confirmation)
  end
 
 end
