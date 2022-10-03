@@ -27,3 +27,16 @@ User.all.each do |user|
     puts "Created Post #{index} - #{user.name}"
   end
 end
+
+Post.all.each do |post|
+ count = rand(25)
+ (1..count).each do |index|
+   post.comments.create(
+     user_id: User.pluck(:id).sample,
+     message: "This is the comment message #{index} for Post #{post.id}.",
+     commented_at: Time.now - index
+   ).save!
+
+   puts "Created Comment #{index} for Post #{post.id}"
+ end
+end

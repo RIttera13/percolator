@@ -1,9 +1,6 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
 
   test "invalid if new user is missing a name." do
     user = User.create(name: nil, password: "testuser", email: "test1@email.com")

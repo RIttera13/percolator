@@ -10,11 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_02_215825) do
+ActiveRecord::Schema.define(version: 2022_10_03_043301) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "hstore"
   enable_extension "plpgsql"
+
+  create_table "comments", force: :cascade do |t|
+    t.text "message"
+    t.datetime "commented_at"
+    t.bigint "user_id"
+    t.bigint "post_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
 
   create_table "jwt_denylist", force: :cascade do |t|
     t.string "jti", null: false

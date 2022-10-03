@@ -1,9 +1,6 @@
 require 'test_helper'
 
 class PostTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
 
   test "invalid if new post is missing a title." do
     User.create(name: "Test", password: "testuser", email: "test3@email.com", github_username: "test3githubname").save

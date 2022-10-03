@@ -32,7 +32,7 @@ class PostsController < ApplicationController
     updated_params[:posted_at] = Time.now
     @post = Post.new(updated_params)
     if @post.save
-      render json: {message: 'Your post has been created.' }, status: :created
+      render json: {message: "Your post has been created. ID: #{@post.id}" }, status: :created
     else
       render json: {message: 'Error, your post was not created.' }, status: :internal_server_error
     end
@@ -43,7 +43,7 @@ class PostsController < ApplicationController
     if @post.present?
       if @post.user_id == @current_user_id
         if @post.update(post_params)
-          render json: {message: 'Your post has been updated.' }, status: :ok
+          render json: {message: "Your post has been updated. ID: #{@post.id}" }, status: :ok
         else
           render json: {message: "Error, there was a problem updating this post." }, status: :internal_server_error
         end
@@ -60,7 +60,7 @@ class PostsController < ApplicationController
     if @post.present?
       if @post.user_id == @current_user_id
         if @post.destroy
-          render json: {message: 'Your post has been deleted.' }, status: :ok
+          render json: {message: "Your post has been deleted. ID: #{@post.id}" }, status: :ok
         else
           render json: {message: "Error, there was a problem deleting this post." }, status: :internal_server_error
         end
