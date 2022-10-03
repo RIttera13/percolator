@@ -5,3 +5,25 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+(1..100).each do |index|
+  User.create(
+    name: "User_#{index}",
+    github_username: "GitHub_#{index}",
+    email: "email_#{index}@test.com"
+  ).save!
+
+  puts "Created User_#{index}"
+end
+
+User.all.each do |user|
+  count = rand(50)
+  (1..count).each do |index|
+    user.posts.create(
+      title: "Title for Post #{index}",
+      body: "Body for post #{index}",
+      posted_at: Time.now - index
+    ).save!
+
+    puts "Created Post #{index} - #{user.name}"
+  end
+end
