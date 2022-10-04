@@ -4,13 +4,15 @@ class CommentsController < ApplicationController
   before_action :set_page, only: [:index]
 
   def index
-    @current_comments = []
+
     @comments = Comment.order('id DESC').limit(25).offset(@page_number * 25)
 
+    # Adjust the data block to include items and reduce API calls
+    @current_comments = []
     @comments.each do |comment|
-      name = comment.user.name
       comment = comment.as_json
-      comment[:user_name] = name
+      comment[:user_name] = comment.user.name
+      comment[:user_average_rating] = comment.user.average_rating
       @current_comments.push(comment)
     end
 
@@ -20,7 +22,7 @@ class CommentsController < ApplicationController
   def show
     @comment = Comment.find(params[:id])
     if @comment.present?
-      render json: {message: "Comment #{@comment.id}.", comment: {id: @comment.id, message: @comment.message, user_id: @comment.user_id, post_id: @comment.post_id, user_name: @comment.user.name, commented_at: @comment.commented_at, created_at: @comment.created_at, updated_at: @comment.updated_at} }, status: :ok
+      render json: {message: "Comment #{@comment.id}.", comment: {id: @comment.id, message: @comment.message, user_id: @comment.user_id, post_id: @comment.post_id, user_name: @comment.user.name, user_average_rating: @comment.user.user_average_rating, commented_at: @comment.commented_at, created_at: @comment.created_at, updated_at: @comment.updated_at} }, status: :ok
     else
       render json: {message: "Comment #{@comment.id} not found."}, status: :not_found
     end

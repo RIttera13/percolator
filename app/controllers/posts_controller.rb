@@ -4,13 +4,16 @@ class PostsController < ApplicationController
   before_action :set_page, only: [:index]
 
   def index
-    @current_posts = []
+
     @posts = Post.order('id DESC').limit(25).offset(@page_number * 25)
 
+    # Adjust the data block to include items and reduce API calls
+    @current_posts = []
     @posts.each do |post|
-      name = post.user.name
       post = post.as_json
-      post[:user_name] = name
+      post[:user_name] = post.user.name
+      post[:user_rating] = post.user.average_rating
+      post[:comment_count] = post.comments.count
       @current_posts.push(post)
     end
 
@@ -20,7 +23,7 @@ class PostsController < ApplicationController
   def show
     @post = Post.find(params[:id])
     if @post.present?
-      render json: {message: "Post #{@post.id}.", posts: {id: @post.id, title: @post.title, body: @post.body, user_id: @post.user_id, user_name: @post.user.name, posted_at: @post.posted_at, created_at: @post.created_at, updated_at: @post.updated_at} }, status: :ok
+      render json: {message: "Post #{@post.id}.", posts: {id: @post.id, title: @post.title, body: @post.body, user_id: @post.user_id, user_name: @post.user.name, user_rating: @post.user.average_rating, comment_count: @post.comments.count, posted_at: @post.posted_at, created_at: @post.created_at, updated_at: @post.updated_at} }, status: :ok
     else
       render json: {message: "Post #{@post.id} not found."}, status: :not_found
     end

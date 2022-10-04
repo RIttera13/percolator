@@ -4,13 +4,15 @@ class RatingsController < ApplicationController
   before_action :set_page, only: [:index]
 
   def index
-    @current_ratings = []
+
     @ratings = Rating.order('id DESC').limit(25).offset(@page_number * 25)
 
+    # Adjust the data block to include items and reduce API calls
+    @current_ratings = []
     @ratings.each do |rating|
-      name = rating.user.name
       rating = rating.as_json
-      rating[:user_name] = name
+      rating[:user_name] = rating.user.name
+      rating[:rater_name] = rating.rater.name
       @current_ratings.push(rating)
     end
 

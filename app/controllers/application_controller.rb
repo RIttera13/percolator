@@ -12,6 +12,7 @@ class ApplicationController < ActionController::API
     @current_user ||= super || User.find(@current_user_id)
   end
 
+  # Method to check the token with API requests, and determin the current user.
   def process_token
     if request.headers['Authorization'].present?
       begin

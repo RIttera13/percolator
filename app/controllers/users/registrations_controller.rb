@@ -6,7 +6,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
     updated_params[:registered_at] = Time.now
 
     build_resource(updated_params)
-
+    
+    # Standard default devise method from here down, exposed to allow customeize parameters from above.
     resource.save
     yield resource if block_given?
     if resource.persisted?

@@ -15,7 +15,7 @@ class GetGithubUserEvents
       # Send API request and access the returned data.
       request = HTTParty.get("#{uri}", :headers => request_settings[:headers], :query => request_settings[:query])
 
-      # Return if the Github username returns not found. 
+      # Return if the Github username returns not found.
       if request.message == "Not Found"
         return request
       end
@@ -42,7 +42,12 @@ class GetGithubUserEvents
         else
           event_type = "Unknown Event"
         end
-        github_events.push({type: event_type, timestamp: event["created_at"]})
+
+        # Check response and standardize for presentation to requestor.
+        repo = event["repo"]["name"].present? ? event["repo"]["name"] : "N/A"
+        branch = event["payload"]["ref"].present? ? event["payload"]["ref"].split("/").last : "N/A" # This is not ideal, but works for now.
+        pull_request_number = event["payload"]["number"].present? ? event["payload"]["number"] : nil
+        github_events.push({type: event_type, repository: repo, branch: branch, pull_request_number: pull_request_number, timestamp: event["created_at"]})
       end
 
       return github_events
