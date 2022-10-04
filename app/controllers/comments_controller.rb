@@ -3,7 +3,7 @@ class CommentsController < ApplicationController
   before_action :process_token
   before_action :set_page, only: [:index]
   before_action :authenticate_user!, :except => [:index]
-  
+
   def index
 
     @comments = GetComments.call(@page_number)
@@ -80,7 +80,7 @@ class CommentsController < ApplicationController
  private
 
   def set_page
-    @page_number = params[:page].to_i || 0
+    @page_number = params[:page].present? ? params[:page].to_i : 1
   end
 
   # Only allow a list of trusted parameters through.

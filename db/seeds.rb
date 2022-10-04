@@ -8,7 +8,8 @@
 (1..100).each do |index|
   User.create(
     name: "User_#{index}",
-    github_username: "GitHub_#{index}",
+    github_username: "RIttera13",
+    password: "password",
     email: "email_#{index}@test.com"
   ).save!
 
@@ -16,7 +17,7 @@
 end
 
 User.all.each do |user|
-  count = rand(10)
+  count = rand(50)
   (1..count).each do |index|
     user.posts.create(
       title: "Title for Post #{index}",
@@ -27,7 +28,7 @@ User.all.each do |user|
     puts "Created Post #{index} - #{user.name}"
   end
 
-  5.times do
+  30.times do
     other_user = User.where.not(id: user.id).sample
     rating = [1, 2, 3, 4, 5].sample
     Rating.create(user_id: user.id, rater_id: other_user.id, rating: rating, rated_at: Time.now).save!
@@ -37,7 +38,7 @@ User.all.each do |user|
 end
 
 Post.all.each do |post|
- count = rand(10)
+ count = rand(50)
  (1..count).each do |index|
    post.comments.create(
      user_id: User.pluck(:id).sample,
@@ -47,4 +48,13 @@ Post.all.each do |post|
 
    puts "Created Comment #{index} for Post #{post.id}"
  end
+end
+
+User.all.each do |user|
+  average_rating = user.ratings.average(:rating)
+  if average_rating >= 4
+    user.update(average_rating: average_rating, passed_four_stars: Time.now)
+  else
+    user.update(average_rating: average_rating, passed_four_stars: nil)
+  end
 end
