@@ -5,16 +5,11 @@ class ActivityFeedController < ApplicationController
   before_action :authenticate_user!
 
   def show
-
-    @posts = GetPosts.call(@page_number, @current_user)
-    @comments = GetComments.call(@page_number, @current_user)
-    @ratings = GetRatings.call(@page_number, @current_user)
-    @github_events = GetGithubUserEvents.call(@page_number, @current_user)
-binding.pry
-    if 1 > 0
-      render json: {message: "Success Message."}, status: :ok
-    else
-      render json: {message: "Error Message."}, status: :not_found
+    begin
+      @activity_list = SortActivityFeed.call(@current_user)
+      render json: {message: "Activitys #{1} - #{activity_list.count}", activity_list: @activity_list.as_json}, status: :ok
+    rescue => error
+      render json: {message: 'Error, your activity feed is not available right nom.', errors: error }, status: :internal_server_error
     end
   end
 

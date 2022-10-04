@@ -30,7 +30,7 @@ class GetGithubUserEvents
       request.each do |event|
         event_type = ""
         if (event["type"] == "PullRequestEvent") && (event["payload"]["action"] == "opened")
-          event_type = "Created New Pull Request"
+          event_type = "Opened New Pull Request"
         elsif (event["type"] == "PullRequestEvent") && (event["payload"]["action"] == "closed")
           event_type = "Merged Pull Request"
         elsif (event["type"] == "CreateEvent") && (event["payload"]["ref_type"] == "repository")
@@ -40,7 +40,7 @@ class GetGithubUserEvents
         elsif event["type"] == "PushEvent"
           event_type = "Pushed Commits to Branch"
         else
-          event_type = "Unknown Event"
+          next
         end
 
         # Check response and standardize for presentation to requestor.
