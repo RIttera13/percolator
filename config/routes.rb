@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   resources :ratings, only: [:index, :show, :create, :update, :destroy]
 
   get '/current_user', to: 'current_user#index'
+  get '/activity_feed', to: 'activity_feed#show'
 
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end

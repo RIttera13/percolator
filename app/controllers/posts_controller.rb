@@ -2,18 +2,22 @@ class PostsController < ApplicationController
   respond_to :JSON
   before_action :process_token
   before_action :set_page, only: [:index]
-
+  before_action :authenticate_user!, :except => [:index]
+  
   def index
 
-    @posts = Post.order('id DESC').limit(25).offset(@page_number * 25)
+    @posts = GetPosts.call(@page_number)
 
     # Adjust the data block to include items and reduce API calls
     @current_posts = []
     @posts.each do |post|
+      user_name = post.user.name
+      average = post.user.average_rating
+      comment_count = post.comments.count
       post = post.as_json
-      post[:user_name] = post.user.name
-      post[:user_rating] = post.user.average_rating
-      post[:comment_count] = post.comments.count
+      post[:user_name] = user_name
+      post[:user_rating] = average
+      post[:comment_count] = comment_count
       @current_posts.push(post)
     end
 

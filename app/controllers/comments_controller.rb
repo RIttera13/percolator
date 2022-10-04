@@ -2,17 +2,20 @@ class CommentsController < ApplicationController
   respond_to :JSON
   before_action :process_token
   before_action :set_page, only: [:index]
-
+  before_action :authenticate_user!, :except => [:index]
+  
   def index
 
-    @comments = Comment.order('id DESC').limit(25).offset(@page_number * 25)
+    @comments = GetComments.call(@page_number)
 
     # Adjust the data block to include items and reduce API calls
     @current_comments = []
     @comments.each do |comment|
+      user_name = comment.user.name
+      average_rating = comment.user.average_rating
       comment = comment.as_json
-      comment[:user_name] = comment.user.name
-      comment[:user_average_rating] = comment.user.average_rating
+      comment[:user_name] = user_name
+      comment[:user_average_rating] = average_rating
       @current_comments.push(comment)
     end
 

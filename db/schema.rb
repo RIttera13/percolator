@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 2022_10_03_054052) do
     t.bigint "rater_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["rated_at"], name: "index_ratings_on_rated_at"
     t.index ["rater_id"], name: "index_ratings_on_rater_id"
     t.index ["user_id"], name: "index_ratings_on_user_id"
   end
@@ -75,7 +76,9 @@ ActiveRecord::Schema.define(version: 2022_10_03_054052) do
     t.datetime "registered_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["average_rating"], name: "index_users_on_average_rating"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["github_username"], name: "index_users_on_github_username"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 

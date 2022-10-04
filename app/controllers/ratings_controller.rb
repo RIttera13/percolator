@@ -2,17 +2,20 @@ class RatingsController < ApplicationController
   respond_to :JSON
   before_action :process_token
   before_action :set_page, only: [:index]
-
+  before_action :authenticate_user!, :except => [:index]
+  
   def index
 
-    @ratings = Rating.order('id DESC').limit(25).offset(@page_number * 25)
+    @ratings = GetRatings.call(@page_number)
 
     # Adjust the data block to include items and reduce API calls
     @current_ratings = []
     @ratings.each do |rating|
+      user_name = rating.user.name
+      rater_name = rating.rater.name
       rating = rating.as_json
-      rating[:user_name] = rating.user.name
-      rating[:rater_name] = rating.rater.name
+      rating[:user_name] = user_name
+      rating[:rater_name] = rater_name
       @current_ratings.push(rating)
     end
 

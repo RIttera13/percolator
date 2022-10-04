@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::API
 
   def authenticate_user!(options = {})
-    head :unauthorized unless signed_in?
+    render json: {message: "Unauthorized, user not authenticated."}, status: :unauthorized unless signed_in?
   end
 
   def signed_in?
@@ -20,7 +20,7 @@ class ApplicationController < ActionController::API
         jwt_payload = Warden::JWTAuth::UserDecoder.new.call(token, :user, nil)
         @current_user_id = jwt_payload['id']
       rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
-        head :unauthorized
+        render json: {message: "Unauthorized, user not authenticated."}, status: :unauthorized
       end
     end
   end
