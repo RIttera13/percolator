@@ -8,7 +8,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[6.0]
       t.string :github_username
       t.string :email,              null: false, default: ""
       t.string :encrypted_password, null: false, default: ""
-
+      t.decimal :average_rating
+      t.datetime :passed_four_stars
 
       ## Recoverable
       t.string   :reset_password_token

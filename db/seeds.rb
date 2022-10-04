@@ -16,7 +16,7 @@
 end
 
 User.all.each do |user|
-  count = rand(50)
+  count = rand(10)
   (1..count).each do |index|
     user.posts.create(
       title: "Title for Post #{index}",
@@ -26,10 +26,18 @@ User.all.each do |user|
 
     puts "Created Post #{index} - #{user.name}"
   end
+
+  5.times do
+    other_user = User.where.not(id: user.id).sample
+    rating = [1, 2, 3, 4, 5].sample
+    Rating.create(user_id: user.id, rater_id: other_user.id, rating: rating, rated_at: Time.now).save!
+
+    puts "Created Rating #{user.name} rated #{other_user.name} - #{rating}"
+  end
 end
 
 Post.all.each do |post|
- count = rand(25)
+ count = rand(10)
  (1..count).each do |index|
    post.comments.create(
      user_id: User.pluck(:id).sample,

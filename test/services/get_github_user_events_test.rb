@@ -11,7 +11,7 @@ class GetGithubUserEventsTest < ActiveSupport::TestCase
   test "Valid if user contains a github user_name, but returns empty array." do
     user = User.create(name: nil, password: "testuser", email: "test1@email.com", github_username: "tater")
     github_events = GetGithubUserEvents.call(user.github_username)
-    assert_not github_events.present?
+    assert github_events.count < 3
   end
 
   test "Valid if user contains a github user_name, and returns data." do
