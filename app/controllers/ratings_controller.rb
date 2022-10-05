@@ -25,9 +25,9 @@ class RatingsController < ApplicationController
   def show
     @rating = Rating.find(params[:id])
     if @rating.present?
-      render json: {message: "Ratings #{@rating.id}.", rating: {id: @rating.id, user_id: @rating.user_id, rater_id: @rating.rater_id, user_name: @rating.user.name, rating: @rating.rating, rated_at: @rating.rated_at, created_at: @rating.created_at, updated_at: @rating.updated_at} }, status: :ok
+      render json: { rating: {id: @rating.id, user_id: @rating.user_id, rater_id: @rating.rater_id, user_name: @rating.user.name, rating: @rating.rating, rated_at: @rating.rated_at, created_at: @rating.created_at, updated_at: @rating.updated_at} }, status: :ok
     else
-      render json: {message: "Ratings #{@rating.id} not found."}, status: :not_found
+      render json: { message: "Ratings #{@rating.id} not found." }, status: :not_found
     end
   end
 
@@ -51,7 +51,7 @@ class RatingsController < ApplicationController
         # On creation of a new rating, we update the average rating for the user that received the rating
         update_user_average_rating(@rating.user)
 
-        render json: {message: "You rated #{@rating.user.name} a #{@rating.rating}." }, status: :created
+        render json: {message: "You rated #{@rating.user.name} a #{@rating.rating}. ID: #{@rating.id}" }, status: :created
       else
         render json: {message: 'Error, your rating was not created.' }, status: :internal_server_error
       end
@@ -69,7 +69,7 @@ class RatingsController < ApplicationController
           # On update of a rating, we update the average rating for the user that received the rating
           update_user_average_rating(@rating.user)
 
-          render json: {message: "Your rating has been updated. #{@rating.user.name} is now a #{@rating.rating}" }, status: :ok
+          render json: {message: "Your rating has been updated. #{@rating.user.name} is now a #{@rating.rating}. ID: #{@rating.id}" }, status: :ok
         else
           render json: {message: "Error, there was a problem updating this rating." }, status: :internal_server_error
         end
@@ -104,7 +104,6 @@ class RatingsController < ApplicationController
 
   # Method to update a users average rating and when they passed 4 stars
   def update_user_average_rating(user)
-    prior_average = user.average_rating
     user.update(average_rating: @rating.user.ratings.average(:rating).to_f)
     if user.average_rating >= 4
       user.update(passed_four_stars: Time.now)

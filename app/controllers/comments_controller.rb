@@ -12,7 +12,7 @@ class CommentsController < ApplicationController
     @current_comments = []
     @comments.each do |comment|
       user_name = comment.user.name
-      average_rating = comment.user.average_rating
+      average_rating = comment.user.average_rating.to_f.round(1)
       comment = comment.as_json
       comment[:user_name] = user_name
       comment[:user_average_rating] = average_rating
@@ -25,9 +25,9 @@ class CommentsController < ApplicationController
   def show
     @comment = Comment.find(params[:id])
     if @comment.present?
-      render json: {message: "Comment #{@comment.id}.", comment: {id: @comment.id, message: @comment.message, user_id: @comment.user_id, post_id: @comment.post_id, user_name: @comment.user.name, user_average_rating: @comment.user.user_average_rating, commented_at: @comment.commented_at, created_at: @comment.created_at, updated_at: @comment.updated_at} }, status: :ok
+      render json: { comment: {id: @comment.id, message: @comment.message, user_id: @comment.user_id, post_id: @comment.post_id, user_name: @comment.user.name, user_average_rating: @comment.user.average_rating.to_f.round(1), commented_at: @comment.commented_at, created_at: @comment.created_at, updated_at: @comment.updated_at} }, status: :ok
     else
-      render json: {message: "Comment #{@comment.id} not found."}, status: :not_found
+      render json: { message: "Comment #{@comment.id} not found." }, status: :not_found
     end
   end
 

@@ -8,8 +8,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[6.0]
       t.string :github_username
       t.string :email,              null: false, default: ""
       t.string :encrypted_password, null: false, default: ""
-      t.decimal :average_rating
-      t.datetime :passed_four_stars
+      t.decimal :average_rating, null: false, default: 1
+      t.datetime :passed_four_stars, default: nil
 
       ## Recoverable
       t.string   :reset_password_token
@@ -19,7 +19,7 @@ class DeviseCreateUsers < ActiveRecord::Migration[6.0]
       t.datetime :remember_created_at
 
       ## Trackable
-      t.integer  :sign_in_count, default: 0, null: false
+      t.integer  :sign_in_count, null: false, default: 0
       t.datetime :current_sign_in_at
       t.datetime :last_sign_in_at
       t.inet     :current_sign_in_ip

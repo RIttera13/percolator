@@ -12,7 +12,7 @@ class PostsController < ApplicationController
     @current_posts = []
     @posts.each do |post|
       user_name = post.user.name
-      average = post.user.average_rating
+      average = post.user.average_rating.to_f.round(1)
       comment_count = post.comments.count
       post = post.as_json
       post[:user_name] = user_name
@@ -27,9 +27,9 @@ class PostsController < ApplicationController
   def show
     @post = Post.find(params[:id])
     if @post.present?
-      render json: {message: "Post #{@post.id}.", posts: {id: @post.id, title: @post.title, body: @post.body, user_id: @post.user_id, user_name: @post.user.name, user_rating: @post.user.average_rating, comment_count: @post.comments.count, posted_at: @post.posted_at, created_at: @post.created_at, updated_at: @post.updated_at} }, status: :ok
+      render json: { post: {id: @post.id, title: @post.title, body: @post.body, user_id: @post.user_id, user_name: @post.user.name, user_rating: @post.user.average_rating.to_f.round(1), comment_count: @post.comments.count, posted_at: @post.posted_at, created_at: @post.created_at, updated_at: @post.updated_at} }, status: :ok
     else
-      render json: {message: "Post #{@post.id} not found."}, status: :not_found
+      render json: { message: "Post #{@post.id} not found." }, status: :not_found
     end
   end
 

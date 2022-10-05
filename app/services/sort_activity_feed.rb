@@ -43,7 +43,7 @@ class SortActivityFeed
       # Remove everything except the github event data
       github_events.delete_if {|a| a[:last_page] || a[:page] }
       user_activites += github_events.reject { |s| s[:timestamp] == nil }.map do |github_event|
-        Activity.new("github", {type: github_event[:type], repository: github_event[:repository], branch: github_event[:brach], pull_request_number: github_event[:pull_request_number]}, github_event[:timestamp].to_datetime)
+        Activity.new("github", {event_type: github_event[:type], repository: github_event[:repository], branch: github_event[:brach], pull_request_number: github_event[:pull_request_number]}, github_event[:timestamp].to_datetime)
       end
     rescue => error
       puts error

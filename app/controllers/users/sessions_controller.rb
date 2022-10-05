@@ -1,7 +1,8 @@
 class Users::SessionsController < Devise::SessionsController
   respond_to :JSON
+  before_action :process_token, only: [:destroy]
 
-  # GET /resource/sign_in
+  # GET /users/sign_in
   def new
     self.resource = resource_class.new(sign_in_params)
     clean_up_passwords(resource)
@@ -9,13 +10,19 @@ class Users::SessionsController < Devise::SessionsController
     respond_with(resource, serialize_options(resource))
   end
 
-  # POST /resource/sign_in
+  # POST /users/sign_in
   def create
     self.resource = warden.authenticate!(auth_options)
     set_flash_message!(:notice, :signed_in)
     sign_in(resource_name, resource)
     yield resource if block_given?
     respond_with resource, location: after_sign_in_path_for(resource)
+  end
+
+  # DELETE /users/sign_out
+  def destroy
+    binding.pry
+    
   end
 
   private
@@ -25,7 +32,7 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   def respond_on_destroy
-    current_user ? log_out_success : log_out_failure
+    @current_user ? log_out_success : log_out_failure
   end
 
   def log_out_success

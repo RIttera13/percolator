@@ -3,7 +3,6 @@ Rails.application.routes.draw do
     controllers: {
       sessions: 'users/sessions',
       registrations: 'users/registrations',
-      users: 'users/users'
     }
 
   resources :posts, only: [:index, :show, :create, :update, :destroy]

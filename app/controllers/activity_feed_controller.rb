@@ -12,7 +12,7 @@ class ActivityFeedController < ApplicationController
         # Return "No Content" when there are no activites to send.
         render json: {message: "Not more activities.", activity_list: {}.as_json, page_number: @activity_list[:page_number]}, status: :ok
       else
-        render json: {message: "Activitys #{@activity_list[:activity_number_start]} - #{@activity_list[:activity_number_end]}", activity_list: @activity_list[:activities].as_json, page_number: @activity_list[:page_number]}, status: :ok
+        render json: {message: "Activities #{@activity_list[:activity_number_start]} - #{@activity_list[:activity_number_end]}", activity_list: @activity_list[:activities].as_json, page_number: @activity_list[:page_number]}, status: :ok
       end
     rescue => error
       # Errors will be handled by sending a 500 internal server error respons.
