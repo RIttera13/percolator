@@ -115,7 +115,7 @@ class RatingsController < ApplicationController
  private
 
   def set_page
-    @page_number = params[:page].present? ? params[:page].to_i : 1
+    @page_number = rating_params[:page].present? ? rating_params[:page].to_i : 1
   end
 
   # Only allow a list of trusted parameters through.
@@ -123,7 +123,8 @@ class RatingsController < ApplicationController
     params.require(:rating).permit(
       :rating,
       :user_id,
-      :rating_id
+      :rating_id,
+      :page
     )
   end
 end

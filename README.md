@@ -23,7 +23,8 @@ Installation
 Start the application
 --------
 
-* After installing Ruby, Rails, and starting a PostgreSQL server:
+ - After installing Ruby, Rails, and starting a PostgreSQL server:
+ - Add the following string to the master.key file: `b8cd0eda97fb5ea05ee1ee05ace68318` We would never usually publish this key, but this is not a production application.
 
  _run the following from the applications root directory:_
  - `bundle install`
@@ -71,10 +72,10 @@ User
     - `"github_username":` string
     - `"email":` string
     - `"average_rating":` float
-    - `"passed_four_stars":` string date_time
-    - `"registered_at":` string date_time
-    - `"created_at":` string date_time
-    - `"updated_at":` string date_time
+    - `"passed_four_stars":` string 'date_time'
+    - `"registered_at":` string 'date_time'
+    - `"created_at":` string 'date_time'
+    - `"updated_at":` string 'date_time'
 
 
 Post
@@ -82,22 +83,22 @@ Post
  - Create a new Post
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
-   - Data includes: `{"post": {"title": "", "body": ""}`
+   - Data includes: `{"post": {"title": string, "body": text}`
    - POST `http://localhost:3000/posts`
-   - Successful respons will include `status: 200, {"message":"Your post has been created. ID:       'post_id'"}`
+   - Successful respons will include `status: 200, {"message":"Your post has been created. ID: 'post_id'"}`
 
  - Update a Post
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
-   - Data includes: `{"post": {"title": "", "body": ""}`
+   - Data includes: `{"post": {"title": string, "body": text}`
    - PATCH `http://localhost:3000/posts/'post_id'`
-   - Successful respons will include `status: 200, {"message":"Your post has been updated. ID:       'post_id'"}`
+   - Successful respons will include `status: 200, {"message":"Your post has been updated. ID: 'post_id'"}`
 
  - Delete a Post
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`    
    - DELETE `http://localhost:3000/posts/'post_id'`
-   - Successful respons will include `status: 200, {"message":"Your post has been deleted. ID:       'post_id'"}`
+   - Successful respons will include `status: 200, {"message":"Your post has been deleted. ID: 'post_id'"}`
 
  - Get a Post
    - Header "Content-Type: application/json"
@@ -112,24 +113,40 @@ Post
     - `"user_name":` string
     - `"user_rating":` float
     - `"comment_count":` integer
-    - `"posted_at":` string date_time
-    - `"created_at":` string date_time
-    - `"updated_at":` string date_time
+    - `"posted_at":` string 'date_time'
+    - `"created_at":` string 'date_time'
+    - `"updated_at":` string 'date_time'
 
+ - Get Comments for a Post
+ _The is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
+   - Header "Content-Type: application/json"
+   - Header `Authorization: Bearer token`
+   - Data includes: `{"post": {"post_id": integer, "page": integer}}`
+   - GET `http://localhost:3000/get_comments_for_post
+   - Successful response will include `status: 200` and a JSON containing:
+    - `"message":` string  "Comments 'starting number' - 'ending number'" e.x. "Comments 1 - 25"
+    - `"post_id":` integer
+    - `"page_number":` integer
+    - `"comments":` [{data}]
+         - `"id":` integer
+         - `"message":` text
+         - `"commented_at":` string 'date_time'
+         - `"user_name":` string
+         - `"user_average_rating":` float
 
 Comment
 -------
  - Create a new Comment
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
-   - Data includes: `{"comment": {"message": "", "post_id": ""}`
+   - Data includes: `{"comment": {"message": text, "post_id": integer}`
    - POST `http://localhost:3000/comments`
    - Successful response will include `status: 200, {"message":"Your comment has been created. ID:    'comment_id'"}`
 
  - Update a Comment
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
-   - Data includes: `{"comment": {"message": ""}`
+   - Data includes: `{"comment": {"message": text}`
    - PATCH `http://localhost:3000/comments/'comment_id'`
    - Successful response will include `status: 200, {"message":"Your comment has been updated. ID:    'comment_id'"}`
 
@@ -151,9 +168,9 @@ Comment
     - `"post_id":` integer
     - `"user_name":` string
     - `"user_average_rating":` float
-    - `"commented_at":` string date_time
-    - `"created_at":` string date_time
-    - `"updated_at":` string date_time
+    - `"commented_at":` string 'date_time'
+    - `"created_at":` string 'date_time'
+    - `"updated_at":` string 'date_time'
 
 
 Rating
@@ -161,14 +178,14 @@ Rating
  - Create a new Rating
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
-   - Data includes: `{"rating": {"rating": "", "user_id": ""}`
+   - Data includes: `{"rating": {"rating": integer, "user_id": integer}`
    - POST `http://localhost:3000/ratings`
    - Successful response will include `status: 200, {"message":"You rated 'user_name' a 'rating'      ."}`
 
  - Update a Rating
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
-   - Data includes: `{"rating": {"rating": ""}`
+   - Data includes: `{"rating": {"rating": integer}`
    - PATCH `http://localhost:3000/ratings/'rating_id'`
    - Successful response will include `status: 200, {"message":"Your rating has been updated. ID:      'rating_id'"}`
 
@@ -189,34 +206,34 @@ Rating
     - `"rater_id":` integer
     - `"user_name":` string
     - `"rating":` float
-    - `"rated_at":` string date_time
-    - `"created_at":` string date_time
-    - `"updated_at":` string date_time
+    - `"rated_at":` string 'date_time'
+    - `"created_at":` string 'date_time'
+    - `"updated_at":` string 'date_time'
 
 
 Activity Feed (a.k.a Timeline)
-
 -------
+
 _The activity feed is a recursive endpoint. You will receive data in chunks of **50 activities**. Use the `page_number:` in the response to know which page to request next._
 
  - Get an Activity Feed
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
-   - Data includes: `{"activity_feed": { "page": ""}`  _(If no page is given, the default will be      1. You can find the page number in the current response to know what page to ask for next.)_
+   - Data REQUIRES: `{"activity_feed": { "page": integer}`  _(If no page is given, the default will be      1. You can find the page number in the current response to know what page to ask for next.)_
    - GET `http://localhost:3000/activity_feed'`
    - Successful response will include `status: 200` and a JSON containing:
     - `"message":` "Activities 'starting number' - 'ending number'" e.x. "Activities 1 - 50"
     - `"page_number":` integer
     - `"activity_list":` [data]
         -   {"type": "", "data": {}, "date": ""}
-         - `"type":` string `post`, `comment`, `rating`, `average_rating`, `github`
+         - `"type":` string `post`, `comment`, `rating`, `passed_four_stars`, `github`
          - `"post":` {`"title":` string,`"comment_count":` integer}
          - `"comment":` {`"post_owner_name":` string, `"post_owner_average_rating":` float}
          - `"rating":` {`rater_name:` string, `rating:` float}
-         - `"average_rating":` {`average_rating:` float}
-         - `"github":` {`"event_type":` string, `"repository":` string, `"branch":` string,                 `"pull_request_number":` integer}
-         - `"event_type":` string `Opened New Pull Request`, `Merged Pull Request`, `Created New              Repository`, `Created New Branch`, `Pushed Commits to Branch`
-         - `"date":` string date_time
+         - `"passed_four_stars":` {`average_rating:` float}
+         - `"github":` {`"event_type":` string, `"repository":` string, `"branch":` string, `"pull_request_number":` integer, `"commit_count:"` string}
+         - `"event_type":` string `Opened New Pull Request`, `Merged Pull Request`, `Created New Repository`, `Created New Branch`, `Pushed Commits to Branch`
+         - `"date":` string 'date_time'
 
 # Big Thank You!!! #
  * Rails Devise Team

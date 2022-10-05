@@ -1,6 +1,5 @@
 class Users::SessionsController < Devise::SessionsController
   respond_to :JSON
-  before_action :process_token, only: [:destroy]
 
   # GET /users/sign_in
   def new
@@ -19,20 +18,14 @@ class Users::SessionsController < Devise::SessionsController
     respond_with resource, location: after_sign_in_path_for(resource)
   end
 
-  # DELETE /users/sign_out
-  def destroy
-    binding.pry
-    
-  end
-
   private
 
   def response_with(resource, _ops = {})
     render json: {message: 'Logged In.' }, status: :ok
   end
 
-  def respond_on_destroy
-    @current_user ? log_out_success : log_out_failure
+  def respond_to_on_destroy
+    @current_user ? log_out_failure : log_out_success
   end
 
   def log_out_success

@@ -80,7 +80,7 @@ class CommentsController < ApplicationController
  private
 
   def set_page
-    @page_number = params[:page].present? ? params[:page].to_i : 1
+    @page_number = comment_params[:page].present? ? comment_params[:page].to_i : 1
   end
 
   # Only allow a list of trusted parameters through.
@@ -88,7 +88,8 @@ class CommentsController < ApplicationController
     params.require(:comment).permit(
       :message,
       :post_id,
-      :user_id
+      :user_id,
+      :page
     )
   end
 end

@@ -9,26 +9,27 @@ class GetGithubUserEvents
 
       # Configure the headers and query to allow recursive calls for more objects.
       request_settings = {headers: {}}
-      request_settings[:headers] = {"Content-Type" => "application/vnd.github+json"}
-      request_settings[:query] = {"per_page" => 100, "page" => page_number}
+      request_settings[:headers] = { "Content-Type" => "application/vnd.github+json" }
+      request_settings[:query] = { "per_page" => 100, "page" => page_number }
 
       # Send API request and access the returned data.
       request = HTTParty.get("#{uri}", :headers => request_settings[:headers], :query => request_settings[:query])
 
       # Return if the Github username returns not found.
       if request.message == "Not Found" || request.message.include?("rate limit exceeded")
-        return [{error: true, message: request.message}]
+        return [{ error: true, message: request.message }]
       end
       # Check the number of objects returned to determin if there may be more pages.
       if request.count < 100
-        github_events = [{page: page_number}, {last_page: true}]
+        github_events = [{ page: page_number }, { last_page: true }]
       else
-        github_events = [{page: page_number}, {last_page: false}]
+        github_events = [{ page: page_number }, { last_page: false }]
       end
 
       # Loop over the returned data, check each to see the type of event, and add it to the object to return.
       request.each do |event|
         event_type = ""
+        commit_count = 0
         if (event["type"] == "PullRequestEvent") && (event["payload"]["action"] == "opened")
           event_type = "Opened New Pull Request"
         elsif (event["type"] == "PullRequestEvent") && (event["payload"]["action"] == "closed")
@@ -39,6 +40,7 @@ class GetGithubUserEvents
           event_type = "Created New Branch"
         elsif event["type"] == "PushEvent"
           event_type = "Pushed Commits to Branch"
+          commit_count = event["payload"]["commits"].count
         else
           next
         end
@@ -48,7 +50,7 @@ class GetGithubUserEvents
         repo = event["repo"]["name"].present? ? event["repo"]["name"] : "N/A"
         branch = event["payload"]["ref"].present? ? event["payload"]["ref"].split("/").last : "N/A" # This is not ideal, but works for now.
         pull_request_number = event["payload"]["number"].present? ? event["payload"]["number"] : nil
-        github_events.push({type: event_type, repository: repo, branch: branch, pull_request_number: pull_request_number, timestamp: event["created_at"]})
+        github_events.push({ type: event_type, repository: repo, branch: branch, pull_request_number: pull_request_number, commit_count: commit_count, timestamp: event["created_at"] })
       end
 
       return github_events

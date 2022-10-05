@@ -60,7 +60,7 @@ ActiveRecord::Schema.define(version: 2022_10_03_054052) do
     t.string "github_username"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
-    t.decimal "average_rating"
+    t.decimal "average_rating", default: "1.0", null: false
     t.datetime "passed_four_stars"
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"

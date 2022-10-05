@@ -1,12 +1,22 @@
 class GetComments
 
   # Use recursive calls to get more objsects, 25 is the maximum number of objects to return
-  def self.call(page_number = 0, optional_user_id = '')
+  def self.call(page_number = 1, optional_user_id = '', optional_post_id = "")
+
+    offset = (page_number - 1) * 25
+    if offset < 0
+      offset = 0
+    end 
+
     # Get comments for a specific user if a "user_id" is provided, otherwise retun comments from all users.
-    if optional_user_id.present?
-      @comments = Comment.where(user_id: optional_user_id).order('id DESC').limit(25).offset(page_number * 25)
+    if optional_user_id.present? && optional_post_id.present?
+      return { error: "Please send user_id OR post_id, not both." }
+    elsif optional_user_id.present?
+      @comments = Comment.where(user_id: optional_user_id).order('id DESC').limit(25).offset(offset)
+    elsif optional_post_id.present?
+      @comments = Comment.where(post_id: optional_post_id).order('id DESC').limit(25).offset(offset)
     else
-      @comments = Comment.order('id DESC').limit(25).offset(page_number * 25)
+      @comments = Comment.order('id DESC').limit(25).offset(offset)
     end
     return @comments
   end
