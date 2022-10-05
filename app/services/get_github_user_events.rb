@@ -10,17 +10,17 @@ class GetGithubUserEvents
       # Configure the headers and query to allow recursive calls for more objects.
       request_settings = {headers: {}}
       request_settings[:headers] = {"Content-Type" => "application/vnd.github+json"}
-      request_settings[:query] = {"per_page" => 25, "page" => page_number}
+      request_settings[:query] = {"per_page" => 100, "page" => page_number}
 
       # Send API request and access the returned data.
       request = HTTParty.get("#{uri}", :headers => request_settings[:headers], :query => request_settings[:query])
 
       # Return if the Github username returns not found.
-      if request.message == "Not Found"
-        return request
+      if request.message == "Not Found" || request.message.include?("rate limit exceeded")
+        return [{error: true, message: request.message}]
       end
       # Check the number of objects returned to determin if there may be more pages.
-      if request.count < 25
+      if request.count < 100
         github_events = [{page: page_number}, {last_page: true}]
       else
         github_events = [{page: page_number}, {last_page: false}]
@@ -42,6 +42,7 @@ class GetGithubUserEvents
         else
           next
         end
+
 
         # Check response and standardize for presentation to requestor.
         repo = event["repo"]["name"].present? ? event["repo"]["name"] : "N/A"
