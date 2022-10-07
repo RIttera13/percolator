@@ -30,7 +30,7 @@ Start the application
  - `bundle install`
  - `rake db:create`
  - `rake db:migrate`
- - `rale db:seed` _(For quicker testing, adjust the counts lower in the seed file)_
+ - `rale db:seed RAILS_ENV=development or RAILS_ENV=test` _(For quicker testing, adjust the counts lower in the seed file)_
  - `rails server`
 
  _This starts the rails server and should make the API available on `http://localhost:3000`. For production we would make this https and set allowed hosts for better security._
@@ -105,17 +105,17 @@ Post
    - Header `Authorization: Bearer token`  
    - GET `http://localhost:3000/posts/'post_id'`
    - Successful response will include `status: 200` and a JSON containing:
-    - Top-level: `{ "post": {} }`
-    - `"id":` integer
-    - `"title":` string
-    - `"body":` text
-    - `"user_id":` integer
-    - `"user_name":` string
-    - `"user_rating":` float
-    - `"comment_count":` integer
-    - `"posted_at":` string 'date_time'
-    - `"created_at":` string 'date_time'
-    - `"updated_at":` string 'date_time'
+   - Top-level: `{ "post": {} }`
+      - `"id":` integer
+      - `"title":` string
+      - `"body":` text
+      - `"user_id":` integer
+      - `"user_name":` string
+      - `"user_rating":` float
+      - `"comment_count":` integer
+      - `"posted_at":` string 'date_time'
+      - `"created_at":` string 'date_time'
+      - `"updated_at":` string 'date_time'
 
   - Get all Posts
   _This is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
@@ -182,16 +182,16 @@ Comment
    - Header `Authorization: Bearer token`  
    - GET `http://localhost:3000/comments/'comment_id'`
    - Successful response will include `status: 200` and a JSON containing:
-    - Top-level: `{ "comment": {} }`
-    - `"id":` integer
-    - `"message":` text
-    - `"user_id":` integer
-    - `"post_id":` integer
-    - `"user_name":` string
-    - `"user_average_rating":` float
-    - `"commented_at":` string 'date_time'
-    - `"created_at":` string 'date_time'
-    - `"updated_at":` string 'date_time'
+   - Top-level: `{ "comment": {} }`
+      - `"id":` integer
+      - `"message":` text
+      - `"user_id":` integer
+      - `"post_id":` integer
+      - `"user_name":` string
+      - `"user_average_rating":` float
+      - `"commented_at":` string 'date_time'
+      - `"created_at":` string 'date_time'
+      - `"updated_at":` string 'date_time'
 
   - Get all Comments
    _This is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
@@ -241,15 +241,15 @@ Rating
    - Header `Authorization: Bearer token`
    - GET `http://localhost:3000/ratings/'rating_id'`
    - Successful response will include `status: 200` and a JSON containing:
-    - Top-level: `{ "rating": {} }`
-    - `"id":` integer
-    - `"user_id":` integer
-    - `"rater_id":` integer
-    - `"user_name":` string
-    - `"rating":` float
-    - `"rated_at":` string 'date_time'
-    - `"created_at":` string 'date_time'
-    - `"updated_at":` string 'date_time'
+   - Top-level: `{ "rating": {} }`
+     - `"id":` integer
+     - `"user_id":` integer
+     - `"rater_id":` integer
+     - `"user_name":` string
+     - `"rating":` float
+     - `"rated_at":` string 'date_time'
+     - `"created_at":` string 'date_time'
+     - `"updated_at":` string 'date_time'
 
  - Get all Rating
  _This is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
