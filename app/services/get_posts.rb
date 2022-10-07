@@ -1,11 +1,14 @@
 class GetPosts
 
   # Use recursive calls to get more objsects, 25 is the maximum number of objects to return
-  def self.call(page_number = 1, optional_user_id = '')
+  def self.call(page_number = 1, optional_user_id = "")
+    # verify page number is integer
+    page_number = page_number.present? ? page_number.to_i : 1
 
     offset = (page_number - 1) * 25
-    if offset < 0
+    if offset <= 0
       offset = 0
+      page_number = 1
     end
 
     # Get posts for a specific user if a "user_id" is provided, otherwise retun posts from all users.
@@ -14,6 +17,6 @@ class GetPosts
     else
       @posts = Post.order('id DESC').limit(25).offset(offset)
     end
-    return @posts
+    return {posts: @posts, page_number: page_number}
   end
 end

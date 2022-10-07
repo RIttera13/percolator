@@ -2,6 +2,8 @@ class RatingsController < ApplicationController
   respond_to :JSON
   before_action :process_token
   before_action :set_page, only: [:index]
+  before_action :set_user_id, only: [:index]
+  before_action :set_rater_id, only: [:index]
   before_action :authenticate_user!, :except => [:index]
 
   def index
@@ -10,7 +12,7 @@ class RatingsController < ApplicationController
 
     # Adjust the data block to include items and reduce API calls
     @current_ratings = []
-    @ratings.each do |rating|
+    @ratings[:ratings].each do |rating|
       user_name = rating.user.name
       rater_name = rating.rater.name
       rating = rating.as_json
@@ -18,8 +20,9 @@ class RatingsController < ApplicationController
       rating[:rater_name] = rater_name
       @current_ratings.push(rating)
     end
+    starting_number = (@ratings[:page_number].to_i * 25) - 24
 
-    render json: {message: "Ratings #{@ratings.last.id} - #{@ratings.first.id}.", ratings: @current_ratings.as_json}, status: :ok
+    render json: {message: "Ratings #{starting_number} - #{starting_number + (@ratings[:ratings].count - 1)}.", ratings: @current_ratings.as_json, page_number: @ratings[:page_number]}, status: :ok
   end
 
   def show
@@ -46,6 +49,7 @@ class RatingsController < ApplicationController
       end
 
       @rating = Rating.new(updated_params)
+
       if @rating.save
 
         # On creation of a new rating, we update the average rating for the user that received the rating
@@ -84,7 +88,7 @@ class RatingsController < ApplicationController
   def destroy
     @rating = Rating.find(params[:id])
     if @rating.present?
-      if @rating.user_id == @current_user_id
+      if @rating.rater_id == @current_user_id
         if @rating.destroy
 
           # On Delete of a rating, we update the average rating for the user that received the rating
@@ -118,12 +122,20 @@ class RatingsController < ApplicationController
     @page_number = rating_params[:page].present? ? rating_params[:page].to_i : 1
   end
 
+  def set_user_id
+    @user_id = rating_params[:user_id].present? ? rating_params[:user_id].to_i : ""
+  end
+
+  def set_rater_id
+    @rater_id = rating_params[:rater_id].present? ? rating_params[:rater_id].to_i : ""
+  end
+
   # Only allow a list of trusted parameters through.
   def rating_params
     params.require(:rating).permit(
       :rating,
       :user_id,
-      :rating_id,
+      :rater_id,
       :page
     )
   end

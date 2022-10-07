@@ -1,6 +1,15 @@
 class SortActivityFeed
   def self.call(current_user, page_number = 1)
 
+    # verify page number is integer
+    page_number = page_number.present? ? page_number.to_i : 1
+
+    offset = (page_number - 1) * 25
+    if offset <= 0
+      offset = 0
+      page_number = 1
+    end
+
     # Use recursive calls to get more objsects, 25 is the maximum number of objects to return
     user_activites = []
 

@@ -7,6 +7,7 @@ class User < ApplicationRecord
   validates :email, uniqueness: true
 
   has_many :posts
+  has_many :comments
   has_many :ratings
 
   # Generate JWT token to help get the current user_id from auth token used in api requests.

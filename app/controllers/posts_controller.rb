@@ -2,15 +2,16 @@ class PostsController < ApplicationController
   respond_to :JSON
   before_action :process_token
   before_action :set_page, only: [:index, :get_comments_for_post]
+  before_action :set_user_id, only: [:index, :get_comments_for_post]
+  before_action :set_post_id, only: [:index, :get_comments_for_post]
   before_action :authenticate_user!, :except => [:index]
 
   def index
-
     @posts = GetPosts.call(@page_number)
 
     # Adjust the data block to include items and reduce API calls
     @current_posts = []
-    @posts.each do |post|
+    @posts[:posts].each do |post|
       user_name = post.user.name
       average = post.user.average_rating.to_f.round(1)
       comment_count = post.comments.count
@@ -20,8 +21,9 @@ class PostsController < ApplicationController
       post[:comment_count] = comment_count
       @current_posts.push(post)
     end
+    starting_number = (@posts[:page_number].to_i * 25) - 24
 
-    render json: { message: "Posts #{@posts.last.id} - #{@posts.first.id}.", posts: @current_posts.as_json }, status: :ok
+    render json: { message: "Posts #{starting_number} - #{starting_number + (@posts[:posts].count - 1)}.", posts: @current_posts.as_json, page_number: @posts[:page_number]}, status: :ok
   end
 
   def show
@@ -107,10 +109,18 @@ class PostsController < ApplicationController
     @page_number = post_params[:page].present? ? post_params[:page].to_i : 1
   end
 
+  def set_user_id
+    @user_id = post_params[:user_id].present? ? post_params[:user_id].to_i : ""
+  end
+
+  def set_post_id
+    @post_id = post_params[:post_id].present? ? post_params[:post_id].to_i : ""
+  end
+
   def set_comment_data(comments)
     # Compile the needed attirbutes to reduce API calls.
     @compiled_comments = []
-    comments.each do |comment|
+    comments[:comments].each do |comment|
       @compiled_comments.push(id: comment.id, message: comment.message, commented_at: comment.commented_at, user_name: comment.user.name, user_average_rating: comment.user.average_rating.to_f.round(1))
     end
   end

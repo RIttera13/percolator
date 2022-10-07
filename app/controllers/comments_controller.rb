@@ -2,6 +2,8 @@ class CommentsController < ApplicationController
   respond_to :JSON
   before_action :process_token
   before_action :set_page, only: [:index]
+  before_action :set_user_id, only: [:index]
+  before_action :set_post_id, only: [:index]
   before_action :authenticate_user!, :except => [:index]
 
   def index
@@ -10,7 +12,7 @@ class CommentsController < ApplicationController
 
     # Adjust the data block to include items and reduce API calls
     @current_comments = []
-    @comments.each do |comment|
+    @comments[:comments].each do |comment|
       user_name = comment.user.name
       average_rating = comment.user.average_rating.to_f.round(1)
       comment = comment.as_json
@@ -18,8 +20,9 @@ class CommentsController < ApplicationController
       comment[:user_average_rating] = average_rating
       @current_comments.push(comment)
     end
+    starting_number = (@comments[:page_number].to_i * 25) - 24
 
-    render json: {message: "Comments #{@comments.last.id} - #{@comments.first.id}.", comments: @current_comments.as_json}, status: :ok
+    render json: {message: "Comments #{starting_number} - #{starting_number + (@comments[:comments].count - 1)}.", comments: @current_comments.as_json, page_number: @page_number}, status: :ok
   end
 
   def show
@@ -81,6 +84,14 @@ class CommentsController < ApplicationController
 
   def set_page
     @page_number = comment_params[:page].present? ? comment_params[:page].to_i : 1
+  end
+
+  def set_user_id
+    @user_id = comment_params[:user_id].present? ? comment_params[:user_id].to_i : ""
+  end
+
+  def set_post_id
+    @post_id = comment_params[:post_id].present? ? comment_params[:post_id].to_i : ""
   end
 
   # Only allow a list of trusted parameters through.

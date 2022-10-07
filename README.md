@@ -117,8 +117,29 @@ Post
     - `"created_at":` string 'date_time'
     - `"updated_at":` string 'date_time'
 
+  - Get all Posts
+  _This is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
+    - Header "Content-Type: application/json"
+    - Header `Authorization: Bearer token`
+    - Data includes: `{"post": {"page": integer}`
+    - GET `http://localhost:3000/posts
+    - Successful response will include `status: 200` and a JSON containing:
+    - `"message":` string  "Posts 'starting number' - 'ending number'" e.x. "Posts 1 - 25"
+    - `"page_number":` integer
+    - `"posts":` [{data}]
+      - `"id":` integer
+      - `"title":` string
+      - `"body":` text
+      - `"user_id":` integer
+      - `"user_name":` string
+      - `"user_rating":` float
+      - `"comment_count":` integer
+      - `"posted_at":` string 'date_time'
+      - `"created_at":` string 'date_time'
+      - `"updated_at":` string 'date_time'
+
  - Get Comments for a Post
- _The is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
+ _This is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
    - Header "Content-Type: application/json"
    - Header `Authorization: Bearer token`
    - Data includes: `{"post": {"post_id": integer, "page": integer}}`
@@ -172,6 +193,26 @@ Comment
     - `"created_at":` string 'date_time'
     - `"updated_at":` string 'date_time'
 
+  - Get all Comments
+   _This is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
+    - Header "Content-Type: application/json"
+    - Header `Authorization: Bearer token`
+    - Data includes: `{"comment": {"page": integer}`
+    - GET `http://localhost:3000/comments
+    - Successful response will include `status: 200` and a JSON containing:
+    - `"message":` string  "Comment 'starting number' - 'ending number'" e.x. "Comments 1 - 25"
+    - `"page_number":` integer
+    - `"comments":` [{data}]
+      - `"id":` integer
+      - `"message":` text
+      - `"user_id":` integer
+      - `"post_id":` integer
+      - `"user_name":` string
+      - `"user_average_rating":` float
+      - `"commented_at":` string 'date_time'
+      - `"created_at":` string 'date_time'
+      - `"updated_at":` string 'date_time'
+
 
 Rating
 -------
@@ -197,7 +238,7 @@ Rating
 
  - Get a Rating
    - Header "Content-Type: application/json"
-   - Header `Authorization: Bearer token`  
+   - Header `Authorization: Bearer token`
    - GET `http://localhost:3000/ratings/'rating_id'`
    - Successful response will include `status: 200` and a JSON containing:
     - Top-level: `{ "rating": {} }`
@@ -210,6 +251,24 @@ Rating
     - `"created_at":` string 'date_time'
     - `"updated_at":` string 'date_time'
 
+ - Get all Rating
+ _This is a recursive endpoint. You will receive data in chunks of **25 comments**. Use the `page_number:` in the response to know which page to request next._
+   - Header "Content-Type: application/json"
+   - Header `Authorization: Bearer token`
+   - Data includes: `{"rating": {"rating": integer}`
+   - GET `http://localhost:3000/ratings
+   - Successful response will include `status: 200` and a JSON containing:
+   - `"message":` string  "Ratings 'starting number' - 'ending number'" e.x. "Comments 1 - 25"
+   - `"page_number":` integer
+   - `"ratings":` [{data}]
+     - `"id":` integer
+     - `"user_id":` integer
+     - `"rater_id":` integer
+     - `"user_name":` string
+     - `"rating":` float
+     - `"rated_at":` string 'date_time'
+     - `"created_at":` string 'date_time'
+     - `"updated_at":` string 'date_time'
 
 Activity Feed (a.k.a Timeline)
 -------
