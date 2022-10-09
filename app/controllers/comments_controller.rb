@@ -22,11 +22,11 @@ class CommentsController < ApplicationController
     end
     starting_number = (@comments[:page_number].to_i * 25) - 24
 
-    render json: {message: "Comments #{starting_number} - #{starting_number + (@comments[:comments].count - 1)}.", comments: @current_comments.as_json, page_number: @page_number}, status: :ok
+    render json: {message: "Comments #{starting_number} - #{starting_number + (@comments[:comments].count - 1)}.", comments: @current_comments.as_json, page_number: @comments[:page_number]}, status: :ok
   end
 
   def show
-    @comment = Comment.find(params[:id])
+    @comment = Comment.includes(:user).find(params[:id]) #Optimized by includeing user to first call
     if @comment.present?
       render json: { comment: {id: @comment.id, message: @comment.message, user_id: @comment.user_id, post_id: @comment.post_id, user_name: @comment.user.name, user_average_rating: @comment.user.average_rating.to_f.round(1), commented_at: @comment.commented_at, created_at: @comment.created_at, updated_at: @comment.updated_at} }, status: :ok
     else
@@ -35,10 +35,8 @@ class CommentsController < ApplicationController
   end
 
   def create
-    updated_params = comment_params
-    updated_params[:user_id] = @current_user_id
-    updated_params[:commented_at] = Time.now
-    @comment = Comment.new(updated_params)
+    # Refactored to use one line and reduce steps.
+    @comment = Comment.new(user_id: @current_user_id, commented_at: Time.now, message: comment_params[:message], post_id: comment_params[:post_id])
     if @comment.save
       render json: {message: "Your comment has been created. ID: #{@comment.id}" }, status: :created
     else

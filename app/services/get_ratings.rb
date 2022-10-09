@@ -15,11 +15,11 @@ class GetRatings
     if optional_user_id.present? && optional_rater_id.present?
       return { error: "Please send user_id OR rater_id, not both." }
     elsif optional_user_id.present?
-      @ratings = Rating.where(user_id: optional_user_id).order('id DESC').limit(25).offset(offset)
+      @ratings = Rating.includes(:user, :rater).where(user_id: optional_user_id).order('id DESC').limit(25).offset(offset)
     elsif optional_rater_id.present?
-      @ratings = Rating.where(rater_id: optional_rater_id).order('id DESC').limit(25).offset(offset)
+      @ratings = Rating.includes(:user, :rater).where(rater_id: optional_rater_id).order('id DESC').limit(25).offset(offset)
     else
-      @ratings = Rating.order('id DESC').limit(25).offset(offset)
+      @ratings = Rating.includes(:user, :rater).order('id DESC').limit(25).offset(offset)
     end
     return {ratings: @ratings, page_number: page_number}
   end

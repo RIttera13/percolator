@@ -14,7 +14,7 @@ class PostsController < ApplicationController
     @posts[:posts].each do |post|
       user_name = post.user.name
       average = post.user.average_rating.to_f.round(1)
-      comment_count = post.comments.count
+      comment_count = post.comments.size #Optimized by useing counter_cache for comment count
       post = post.as_json
       post[:user_name] = user_name
       post[:user_rating] = average
@@ -27,7 +27,8 @@ class PostsController < ApplicationController
   end
 
   def show
-    @post = Post.includes(:comments).find(params[:id])
+    #Optimized by including the user and comments along with the comment user in first call
+    @post = Post.includes(:user, :comments => :user).find(params[:id])
     if @post.present?
       @comment_count = 0
       @comments = @post.comments.limit(25)
@@ -46,10 +47,8 @@ class PostsController < ApplicationController
   end
 
   def create
-    updated_params = post_params
-    updated_params[:user_id] = @current_user_id
-    updated_params[:posted_at] = Time.now
-    @post = Post.new(updated_params)
+    # Refactored to use one line and reduce steps.
+    @post = Post.new(user_id: @current_user_id, posted_at: Time.now, title: post_params[:title], body: post_params[:body])
     if @post.save
       render json: { message: "Your post has been created. ID: #{@post.id}" }, status: :created
     else
@@ -97,7 +96,7 @@ class PostsController < ApplicationController
       @comments = GetComments.call(@page_number, "", post_params[:post_id])
       set_comment_data(@comments)
       starting_number = (@page_number * 25) - 24
-      render json: { message: "Comments #{starting_number} - #{starting_number + (@compiled_comments.count - 1)}.", post_id: post_params[:post_id], comments: @compiled_comments, page_number: @page_number}, status: :ok
+      render json: { message: "Comments #{starting_number} - #{starting_number + (@compiled_comments.count - 1)}.", post_id: post_params[:post_id], comments: @compiled_comments, page_number: @comments[:page_number]}, status: :ok
     else
       render json: { message: "Missing 'post_id'." }, status: :bad_request
     end

@@ -26,7 +26,8 @@ class RatingsController < ApplicationController
   end
 
   def show
-    @rating = Rating.find(params[:id])
+    # Optimized by including user in first call
+    @rating = Rating.includes(:user).find(params[:id])
     if @rating.present?
       render json: { rating: {id: @rating.id, user_id: @rating.user_id, rater_id: @rating.rater_id, user_name: @rating.user.name, rating: @rating.rating, rated_at: @rating.rated_at, created_at: @rating.created_at, updated_at: @rating.updated_at} }, status: :ok
     else
@@ -35,21 +36,20 @@ class RatingsController < ApplicationController
   end
 
   def create
-
     # Check if user id matches the rater id, we don't allow users to rate themselves
     if rating_params[:user_id] != @current_user_id
-      updated_params = rating_params
-      updated_params[:rater_id] = @current_user_id
-      updated_params[:rated_at] = Time.now
 
       # Check if user has already received a rating from the rater and delete any matching objects
-      existing_rating = Rating.where(user_id: updated_params[:user_id]).where(rater_id: updated_params[:rater_id])
+      existing_rating = Rating.where(user_id: rating_params[:user_id]).where(rater_id: rating_params[:rater_id])
       if existing_rating.present?
-        existing_rating.delete_all
+        # Changed to destroy to allow accurate counter_cache number, delete method will not update the counter_cache
+        existing_rating.each do |rating|
+          Rating.find(rating.id).destroy
+        end
       end
 
-      @rating = Rating.new(updated_params)
-
+      # Refactored to one line and reduced number of steps
+      @rating = Rating.new(rater_id: @current_user_id, rated_at: Time.now, user_id: rating_params[:user_id], rating: rating_params[:rating])
       if @rating.save
 
         # On creation of a new rating, we update the average rating for the user that received the rating
@@ -65,7 +65,7 @@ class RatingsController < ApplicationController
   end
 
   def update
-    @rating = Rating.find(params[:id])
+    @rating = Rating.includes(:user).find(params[:id]) #Optimized by includeing user to first call
     if @rating.present?
       if @rating.rater_id == @current_user_id
         if @rating.update(rating_params)
@@ -86,7 +86,7 @@ class RatingsController < ApplicationController
   end
 
   def destroy
-    @rating = Rating.find(params[:id])
+    @rating = Rating.includes(:user).find(params[:id]) #Optimized by includeing user to first call
     if @rating.present?
       if @rating.rater_id == @current_user_id
         if @rating.destroy

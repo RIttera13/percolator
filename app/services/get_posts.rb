@@ -11,11 +11,12 @@ class GetPosts
       page_number = 1
     end
 
+    # Optimized by including user to first call
     # Get posts for a specific user if a "user_id" is provided, otherwise retun posts from all users.
     if optional_user_id.present?
-      @posts = Post.where(user_id: optional_user_id).order('id DESC').limit(25).offset(offset)
+      @posts = Post.includes(:user).where(user_id: optional_user_id).order('id DESC').limit(25).offset(offset)
     else
-      @posts = Post.order('id DESC').limit(25).offset(offset)
+      @posts = Post.includes(:user).order('id DESC').limit(25).offset(offset)
     end
     return {posts: @posts, page_number: page_number}
   end

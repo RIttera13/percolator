@@ -30,9 +30,6 @@ gem 'httparty'
 # Use devise for user authentication
 gem 'devise'
 gem 'devise-jwt'
-# Use audited to track changes in active directory records
-gem "audited", "~> 4.9"
-
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

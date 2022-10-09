@@ -19,10 +19,10 @@ class SortActivityFeed
     end
 
     user_activites += Post.where(user_id: current_user.id).order('posted_at DESC').reject { |s| s.posted_at == nil }.map do |post|
-      Activity.new("post", { title: post.title, comment_count: post.comments.count }, post.posted_at)
+      Activity.new("post", { title: post.title, comment_count: post.comments.size }, post.posted_at)
     end
 
-    user_activites += Comment.where(user_id: current_user.id).order('commented_at DESC').reject { |s| s.commented_at == nil }.map do |comment|
+    user_activites += Comment.includes(:post => :user).where(user_id: current_user.id).order('commented_at DESC').reject { |s| s.commented_at == nil }.map do |comment|
       Activity.new("comment", { post_owner_name: comment.post.user.name, post_owner_average_rating: comment.post.user.average_rating.to_f.round(1) }, comment.commented_at)
     end
 
