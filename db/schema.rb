@@ -37,13 +37,16 @@ ActiveRecord::Schema.define(version: 2022_10_10_013001) do
   end
 
   create_table "github_events", force: :cascade do |t|
-    t.string "type"
+    t.string "github_event_type"
     t.string "repository"
     t.string "branch"
     t.integer "pull_request_number"
+    t.integer "commit_count"
     t.datetime "timestamp"
     t.bigint "event_timeline_id"
+    t.bigint "user_id"
     t.index ["event_timeline_id"], name: "index_github_events_on_event_timeline_id"
+    t.index ["user_id"], name: "index_github_events_on_user_id"
   end
 
   create_table "jwt_denylist", force: :cascade do |t|

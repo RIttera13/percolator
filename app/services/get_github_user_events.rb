@@ -26,7 +26,7 @@ class GetGithubUserEvents
       else
         github_events = [{ page: page_number }, { last_page: false }]
       end
-
+binding.pry
       # Loop over the returned data, check each to see the type of event, and add it to the object to return.
       request.each do |event|
         event_type = ""
@@ -52,7 +52,7 @@ class GetGithubUserEvents
         pull_request_number = event["payload"]["number"].present? ? event["payload"]["number"] : nil
 
         new_event_timeline = EventTimeline.create(user_id: current_user.id)
-        if GithubEvent.create(type: event_type, repository: repo, branch: branch, pull_request_number: pull_request_number, commit_count: commit_count, timestamp: event["created_at"], event_timeline_id: new_event_timeline.id).save
+        if GithubEvent.create(github_event_type: event_type, repository: repo, branch: branch, pull_request_number: pull_request_number, commit_count: commit_count, timestamp: event["created_at"], event_timeline_id: new_event_timeline.id, user_id: current_user.id).save
           new_event_timeline.update(created_at: event["created_at"])
         else
           new_event_timeline.delete
