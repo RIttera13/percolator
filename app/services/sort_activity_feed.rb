@@ -4,23 +4,28 @@ class SortActivityFeed
     # verify page number is integer
     page_number = page_number.present? ? page_number.to_i : 1
 
-    offset = (page_number - 1)
-    if offset <= 0
-      offset = 0
+    set_page_for_offset = (page_number - 1)
+    if set_page_for_offset <= 0
+      set_page_for_offset = 0
       page_number = 1
     end
+    # Set the offset from the verified page information
+    offset = set_page_for_offset * 50
 
     # Use a resue block with outside API calls so that we can continue to serve other data if the API has errors.
     begin
       # Get all available "github_events" by looping the call until there are no more pages
       call_count = 1
       loop do
+        # Delete all github_events with their event_timeline belonging to the current_user.
         if call_count == 1
           GithubEvent.where(user_id: current_user).each do |event|
-            EventTimeline.find(event.event_timeline).delete
+            if EventTimeline.where(id: event.event_timeline_id).present?
+              EventTimeline.where(id: event.event_timeline_id).destroy_all
+            end
           end
         end
-
+        # Call github and build new github_events with event_timelines from scratch for the current_user. This guaranetees the most current data and reduces the database bloat.
         respons = GetGithubUserEvents.call(current_user, call_count)
         if respons.first[:error].present?
           break
@@ -36,9 +41,13 @@ class SortActivityFeed
       puts error
     end
 
+    # Remove any empty event_timelines to prevent empty returns and keep the object count accurate.
+    empty_timelines = EventTimeline.where(user_id: current_user.id).where(passed_four_stars: nil).left_joins(:post).where(posts: {id: nil}).left_joins(:comment).where(comments: {id: nil}).left_joins(:rating).where(ratings: {id: nil}).left_joins(:github_event).where(github_events: {id: nil})
+    empty_timelines.destroy_all
+
     # Use recursive calls to get more objsects, 50 is the maximum number of objects to return
     user_activites = []
-    current_user.event_timelines.includes(:post, :comment, :rating, :github_event).order('created_at DESC').limit(50).offset(offset).map.with_index do |event, index|
+    current_user.event_timelines.includes(:post, :comment, :rating, :github_event).order('created_at DESC').limit(50).offset((offset)).map.with_index do |event, index|
       if event.passed_four_stars?
         user_activites += [Activity.new("passed_four_stars", { average_rating: current_user.average_rating.to_f.round(1) }, event.created_at)]
       elsif event.post.present?
