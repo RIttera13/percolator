@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_09_165014) do
+ActiveRecord::Schema.define(version: 2022_10_10_013001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "hstore"
@@ -23,8 +23,27 @@ ActiveRecord::Schema.define(version: 2022_10_09_165014) do
     t.bigint "post_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "event_timeline_id"
+    t.index ["event_timeline_id"], name: "index_comments_on_event_timeline_id"
     t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "event_timelines", force: :cascade do |t|
+    t.bigint "user_id"
+    t.datetime "created_at"
+    t.boolean "passed_four_stars"
+    t.index ["user_id"], name: "index_event_timelines_on_user_id"
+  end
+
+  create_table "github_events", force: :cascade do |t|
+    t.string "type"
+    t.string "repository"
+    t.string "branch"
+    t.integer "pull_request_number"
+    t.datetime "timestamp"
+    t.bigint "event_timeline_id"
+    t.index ["event_timeline_id"], name: "index_github_events_on_event_timeline_id"
   end
 
   create_table "jwt_denylist", force: :cascade do |t|
@@ -41,6 +60,8 @@ ActiveRecord::Schema.define(version: 2022_10_09_165014) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "comments_count"
+    t.bigint "event_timeline_id"
+    t.index ["event_timeline_id"], name: "index_posts_on_event_timeline_id"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
@@ -51,6 +72,8 @@ ActiveRecord::Schema.define(version: 2022_10_09_165014) do
     t.bigint "rater_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "event_timeline_id"
+    t.index ["event_timeline_id"], name: "index_ratings_on_event_timeline_id"
     t.index ["rated_at"], name: "index_ratings_on_rated_at"
     t.index ["rater_id"], name: "index_ratings_on_rater_id"
     t.index ["user_id"], name: "index_ratings_on_user_id"
@@ -86,6 +109,9 @@ ActiveRecord::Schema.define(version: 2022_10_09_165014) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "comments", "event_timelines"
+  add_foreign_key "posts", "event_timelines"
+  add_foreign_key "ratings", "event_timelines"
   add_foreign_key "ratings", "users"
   add_foreign_key "ratings", "users", column: "rater_id"
 end

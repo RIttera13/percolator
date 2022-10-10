@@ -2,7 +2,8 @@ class GetGithubUserEvents
   include HTTParty
 
   # Use recursive calls to get more objsects, 25 is the maximum number of objects to return
-  def self.call(github_username, page_number = 1)
+  def self.call(current_user, page_number = 1)
+    github_username = current_user.github_username
     begin
       # Set the API endpoint injecting the github user name.
       uri = "https://api.github.com/users/#{github_username}/events/public"
@@ -45,12 +46,17 @@ class GetGithubUserEvents
           next
         end
 
-
         # Check response and standardize for presentation to requestor.
         repo = event["repo"]["name"].present? ? event["repo"]["name"] : "N/A"
         branch = event["payload"]["ref"].present? ? event["payload"]["ref"].split("/").last : "N/A" # This is not ideal, but works for now.
         pull_request_number = event["payload"]["number"].present? ? event["payload"]["number"] : nil
-        github_events.push({ type: event_type, repository: repo, branch: branch, pull_request_number: pull_request_number, commit_count: commit_count, timestamp: event["created_at"] })
+
+        new_event_timeline = EventTimeline.create(user_id: current_user.id)
+        if GithubEvent.create(type: event_type, repository: repo, branch: branch, pull_request_number: pull_request_number, commit_count: commit_count, timestamp: event["created_at"], event_timeline_id: new_event_timeline.id).save
+          new_event_timeline.update(created_at: event["created_at"])
+        else
+          new_event_timeline.delete
+        end
       end
 
       return github_events

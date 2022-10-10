@@ -109,10 +109,16 @@ class RatingsController < ApplicationController
   # Method to update a users average rating and when they passed 4 stars
   def update_user_average_rating(user)
     user.update(average_rating: @rating.user.ratings.average(:rating).to_f)
-    if user.average_rating >= 4
+    if user.average_rating >= 4 && user.update(passed_four_stars: nil)
       user.update(passed_four_stars: Time.now)
+      unless user.event_timelines.where(passed_four_stars: true).present?
+        EventTimline.create(user_id: user.id, passed_four_stars: true)
+      end
     else
       user.update(passed_four_stars: nil)
+      if user.event_timelines.where(passed_four_stars: true).present?
+        user.event_timelines.where(passed_four_stars: true).delete_all
+      end
     end
   end
 

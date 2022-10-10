@@ -6,9 +6,11 @@ class User < ApplicationRecord
   validates_presence_of :email
   validates :email, uniqueness: true
 
+  has_many :event_timelines
   has_many :posts
   has_many :comments
   has_many :ratings
+  has_many :github_events
 
   # Generate JWT token to help get the current user_id from auth token used in api requests.
   def generate_jwt
